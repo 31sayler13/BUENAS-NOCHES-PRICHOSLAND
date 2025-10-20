@@ -1,52 +1,51 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Cuenta regresiva — Sayler</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuenta regresiva</title>
   <style>
     body {
-      background: #fff;
+      background-color: white;
+      color: black;
       font-family: "Times New Roman", Times, serif;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       text-align: center;
-      color: #000;
+      margin: 0;
+      padding: 0;
     }
 
     #container {
-      max-width: 900px;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     #timer {
-      font-size: 80px;
-      margin-bottom: 20px;
+      font-size: 3em;
+      margin-bottom: 10px;
     }
 
     #final {
       display: none;
-      animation: fadeIn 1.2s ease forwards;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
     }
 
-    #final img {
-      max-width: 90%;
-      height: auto;
-      margin-bottom: 20px;
+    img.final-image {
+      width: 70%;
+      max-width: 600px;
+      margin-bottom: 30px;
     }
 
     #finalText {
-      font-size: 20px;
-      line-height: 1.6;
-      white-space: pre-line;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
+      font-size: 1.1em;
+      max-width: 800px;
+      line-height: 1.5;
+      text-align: justify;
     }
   </style>
 </head>
@@ -58,15 +57,11 @@
     </div>
 
     <div id="final">
-      <img src="https://i.imgur.com/WmVFqYZ.jpeg" alt="Imagen final">
+      <img src="https://i.imgur.com/WmVFqYZ.jpeg" alt="Imagen final" class="final-image">
       <div id="finalText">
-Buenas noches prichosland, he estado viviendo la etapa más fuerte de mi vida y solo me siento a pensar en cosas del pasado últimamente, a veces siento que mis problemas son inútiles, a veces siento que son importantes, pero llegué a la conclusión de que simplemente son un camino, un camino que me lleva a la LUX.
-
-Me voy de la música porque no me siento tan cómodo a veces pasando tanto tiempo en esto, quiero ser sincero con todos ustedes y no hablar con sarcasmo. Este año tuve la pérdida más grande de los últimos años y me perdí a mí mismo por muchas otras cosas más.
-
-Fuera de prichosland mi vida es un caos y tengo que dejar que ese caos se apodere de mí para encontrar la calma. Mi vida real está rodeada de tareas y estrés, pero no de amigos, y eso me satura. Pero esta vez tengo que encontrar mi camino en esta vida y buscar en mi mente a mi pequeño yo para abrazarlo.
-
-SAYLER XSX ESTÁ MUERTO, pero Sayler está más vivo que nunca y la prueba de ello es que lo puedo sentir y ver todo.
+        Buenas noches prichosland, he estado viviendo la etapa más fuerte de mi vida y solo me siento a pensar en cosas del pasado últimamente, a veces siento que mis problemas son inútiles, a veces siento que son importantes, pero llegué a la conclusión de que simplemente son un camino, un camino que me lleva a la LUX. Me voy de la música porque no me siento tan cómodo a veces pasando tanto tiempo en esto, quiero ser sincero con todos ustedes y no hablar con sarcasmo. Este año tuve la pérdida más grande de los últimos años y me perdí a mí mismo por muchas otras cosas más. Fuera de prichosland mi vida es un caos y tengo que dejar que ese caos se apodere de mí para encontrar la calma. Mi vida real está rodeada de tareas y estrés pero no de amigos, y eso me satura, pero esta vez tengo que encontrar mi camino en esta vida y buscar en mi mente a mi pequeño yo para abrazarlo.
+        <br><br>
+        <strong>SAYLER XSX ESTÁ MUERTO</strong>, pero Sayler está más vivo que nunca, y la prueba de ello es que lo puedo sentir y ver todo.
       </div>
     </div>
   </div>
@@ -77,25 +72,43 @@ SAYLER XSX ESTÁ MUERTO, pero Sayler está más vivo que nunca y la prueba de el
     const countdownEl = document.getElementById("countdown");
     const finalEl = document.getElementById("final");
 
-    const endTime = Date.now() + DURATION;
+    // Revisa si ya existe una hora de finalización guardada
+    let endTime = localStorage.getItem("countdownEndTime");
 
-    const interval = setInterval(() => {
-      const remaining = endTime - Date.now();
+    if (!endTime) {
+      // Si no existe, la crea desde ahora
+      endTime = Date.now() + DURATION;
+      localStorage.setItem("countdownEndTime", endTime);
+    } else {
+      endTime = parseInt(endTime);
+    }
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const remaining = endTime - now;
 
       if (remaining <= 0) {
-        clearInterval(interval);
+        // Cuando termina
         countdownEl.style.display = "none";
-        finalEl.style.display = "block";
+        finalEl.style.display = "flex";
+        localStorage.removeItem("countdownEndTime"); // Limpia para reiniciar si se vuelve a cargar
         return;
       }
 
-      const hours = Math.floor(remaining / (1000 * 60 * 60));
-      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((remaining / (1000 * 60)) % 60);
+      const seconds = Math.floor((remaining / 1000) % 60);
 
       timerEl.textContent =
-        `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    }, 1000);
+        `${String(hours).padStart(2, '0')}:` +
+        `${String(minutes).padStart(2, '0')}:` +
+        `${String(seconds).padStart(2, '0')}`;
+    };
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
   </script>
 </body>
 </html>
+
+
